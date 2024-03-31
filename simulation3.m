@@ -10,6 +10,10 @@ C1 = 0.0; % lbs*sec/in
 C2 = 0.0; % lbs*sec/in
 ms = Ws / g;
 
+
+C2_array = logspace(log10(0.1), log10(100), 10);
+C1_array = 0.7*C2_array;
+
 %% 1.)  Analytically determine equivalent suspension 
 % stiffness and damping at each corner that will provide a 2 Hz ride frequency. 
 
@@ -25,7 +29,18 @@ K1 = 0.7*K2;
 
 Kb = K1*l1 - K2*l2; 
 
-pitch_plane_model(K1, K2, C1, C2, l1, l2, ms, Iy);
+legendEntries = {};
+
+for i = 1:length(C2_array)
+   pitch_plane_model(K1, K2, C1_array(i), C2_array(i), l1, l2, ms, Iy); 
+   legendEntries{end+1} = ['C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for x']; % Example legend entry for mgx
+   legendEntries{end+1} = ['C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for theta']; % Example legend entry for mgth
+   legend(legendEntries); % Update legend with the new entries
+   hold on; % Ensure new plots are added without clearing the old ones
+   hold on;
+end
+
+
 
 
 %% 2.)  Using Olley ride criteria determine appropriate front and rear corner stiffnesses.
@@ -42,7 +57,12 @@ K1 = 0.7*K2;
 
 Kb = K1*l1 - K2*l2; 
 
+
 pitch_plane_model(K1, K2, C1, C2, l1, l2, ms, Iy);
+
+%% 3.)  Construct a block diagram of the pitch plane vehicle system.  
+% Simulate the system response to the vehicle experiencing a time phased 1 in step input.
+
 
 %%
 
@@ -50,16 +70,15 @@ function pitch_plane_model(K1, K2, C1, C2, l1, l2, ms, Iy)
 
     A = [
         0, 1, 0, 0;
-        (-K1 - K2)/ms, 0, (K1*l1 - K2*l2)/ms, 0;
+        (-K1 - K2)/ms, (-C1 - C2)/ms, (K1*l1 - K2*l2)/ms, (l1*C1 - l2*C2)/ms;
         0, 0, 0, 1;
-        (K1*l1 - K2*l2)/Iy, 0, (-K1*l1^2 - K2*l2^2)/Iy, 0;
+        (K1*l1 - K2*l2)/Iy, (l1*C1 - l2*C2)/Iy, (-K1*l1^2 - K2*l2^2)/Iy, (-l1*l1*C1 - l2*l2*C2)/Iy;
         ];
     
     B = [K1/ms, K2/ms; 0, 0; -l1*K1/Iy, l2*K2/Iy; 0, 0];
     
     C = [1, 0, 0, 0; 0, 0, 1, 0];
     D = [0, 0; 0, 0];
-    
     
     [magx,phasex,wx]=bode(ss(A,B(:,1),C(1,:),[0]),logspace(0,2));
      mgx(1:50)=magx;
