@@ -62,12 +62,7 @@ mph2in_sec = 1/0.0568182;
 
 
 legends_x1_in = {};
-
-legends_x = {};
-
-line_width1 = 1.5;
-line_width2 = 0.5;
-
+legends_x2_in = {};
 for i = 1:length(speeds)
     speed = speeds(i)*mph2in_sec; % Convert speed to in/sec before feeding into the Simulink model
 
@@ -87,17 +82,17 @@ for i = 1:length(speeds)
     
 
     legends_x1_in{end+1} = ['Speed = ' num2str(speeds(i))]; % Example legend entry for mgx
-
+    
     % Input plots:
     figure(1);
     % Plot:
     subplot(2,1,1);
-    plot(out_1.x1_in, 'LineWidth', line_width1);
+    plot(out_1.x1_in, 'LineWidth', 1.5);
     hold on;
     grid on;
     
     subplot(2,1,2);
-    plot(out_1.x2_in, 'LineWidth', line_width1); % line_width2
+    plot(out_1.x2_in, 'LineWidth', 1.5);
     hold on;
     grid on;
 
@@ -105,38 +100,25 @@ for i = 1:length(speeds)
     % Output plots:
     figure(2);
     subplot(4,1,1);
-    % plot(out_1.x, 'LineWidth', line_width2, 'Marker', '_', 'Color', [0, 0, 1]);
-    plot(out_1.x, 'LineWidth', line_width2*3);
-    legends_x{end+1} = ['Config 1: Speed = ' num2str(speeds(i))]; 
+    plot(out_1.x, 'LineWidth', 1.5, 'Marker', '*', 'Color',);
     hold on;
     grid on;
-    % plot(out_2.x, 'LineWidth', line_width2, 'Marker', '_', 'Color', [1, 0, 0]);
-    plot(out_2.x, 'LineWidth', line_width2, 'Marker', '.');
-    legends_x{end+1} = ['Config 2 Speed = ' num2str(speeds(i))]; 
+    plot(out_2.x, 'LineWidth', 1.5, 'Marker', '+');
 
     subplot(4,1,2);
-    % plot(out_1.dx, 'LineWidth', line_width2, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.dx, 'LineWidth', line_width2);
+    plot(out_1.dx, 'LineWidth', 1.5, 'Marker', '*');
     hold on;
     grid on;
-    % plot(out_2.dx, 'LineWidth', line_width2, 'Marker', '+', 'Color', [1, 0, 0]);
-    plot(out_2.dx, 'LineWidth', line_width2);
 
     subplot(4,1,3);
-    % plot(out_1.th, 'LineWidth', line_width2, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.th, 'LineWidth', line_width2);
+    plot(out_1.th, 'LineWidth', 1.5, 'Marker', '*');
     hold on;
     grid on;
-    % plot(out_2.th, 'LineWidth', line_width2, 'Marker', '+', 'Color', [1, 0, 0]);
-    plot(out_2.th, 'LineWidth', line_width2);
 
     subplot(4,1,4);
-    % plot(out_1.dth, 'LineWidth', 1.5, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.dth, 'LineWidth', line_width2);
+    plot(out_1.dth, 'LineWidth', 1.5, 'Marker', '*');
     hold on;
     grid on;
-    % plot(out_2.dth, 'LineWidth', 1.5, 'Marker', '+', 'Color', [1, 0, 0]);
-    plot(out_2.dth, 'LineWidth', line_width2);
 
 
 end
@@ -150,13 +132,13 @@ ylim([0,1.2]);
 
 figure(2)
 subplot(4,1,1);
-legend(legends_x);
+legend(legends_x1_in);
 subplot(4,1,2);
-legend(legends_x);
+legend(legends_x1_in);
 subplot(4,1,3);
-legend(legends_x);
+legend(legends_x1_in);
 subplot(4,1,4);
-legend(legends_x);
+legend(legends_x1_in);
 
 
 
