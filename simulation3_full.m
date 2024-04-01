@@ -29,24 +29,6 @@ K1 = 0.7*K2;
 
 Kb = K1*l1 - K2*l2; 
 
-%% Plot the results:
-
-legends_mgx = {};
-legends_mgth = {};
-
-for i = 1:length(C2_array)
-   pitch_plane_model(K1, K2, C1_array(i), C2_array(i), l1, l2, ms, Iy); 
-   legends_mgx{end+1} = ['Heave mag. plot with C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for x']; % Example legend entry for mgx
-   legends_mgth{end+1} = ['Pitch mag. plot with C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for theta']; % Example legend entry for mgth
-   % legend(legendEntries); % Update legend with the new entries
-end
-
-subplot(2,1,1);
-legend(legends_mgx);
-subplot(2,1,2);
-legend(legends_mgth);
-
-
 
 
 %% 2.)  Using Olley ride criteria determine appropriate front and rear corner stiffnesses.
@@ -87,7 +69,7 @@ legend(legends_mgth);
 % 1.) and 2.) above at various speeds.
 % t_des = 1;
 
-speeds = [10, 30, 60, 90, 100, 120]; % (l1 + l2) / t_des;
+speeds = [25, 60, 90, 120]; % (l1 + l2) / t_des;
 
 
 mph2in_sec = 1/0.0568182;

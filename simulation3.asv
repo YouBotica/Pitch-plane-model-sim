@@ -72,7 +72,7 @@ for i = 1:length(C2_array)
    pitch_plane_model(K1, K2, C1_array(i), C2_array(i), l1, l2, ms, Iy); 
    legends_mgx{end+1} = ['Heave mag. plot with C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for x']; % Example legend entry for mgx
    legends_mgth{end+1} = ['Pitch mag. plot with C1 = ' num2str(C1_array(i)) ', C2 = ' num2str(C2_array(i)) ' for theta']; % Example legend entry for mgth
-   % legend(legendEntries); % Update legend with the new entries
+
 end
 
 subplot(2,1,1);
@@ -85,9 +85,42 @@ legend(legends_mgth);
 % Simulate the system response to the vehicle experiencing a time phased 1 in step input.
 % 4.) Use the above simulation to compare the response of the parameters determined in
 % 1.) and 2.) above at various speeds.
-t_des = 1;
-speed = % (l1 + l2) / t_des;
-sim("block_sim3");
+% t_des = 1;
+
+speeds = [10, 50]; % (l1 + l2) / t_des;
+
+
+mph2in_sec = 1/0.0568182;
+
+figure;
+legends_x1_in = {};
+legends_x2_in = {};
+for i = 1:length(speeds)
+    speed = speeds(i)*mph2in_sec; % Convert speed to in/sec before feeding into the Simulink model
+
+    % Simulate:
+    out = sim("block_sim3");
+
+    legends_x1_in{end+1} = ['Speed = ' num2str(speeds(i))]; % Example legend entry for mgx
+
+    % Plot:
+    subplot(2,1,1);
+    plot(out.x1_in, l);
+    hold on;
+    grid on;
+    
+    subplot(2,1,2);
+    plot(out.x2_in);
+    hold on;
+    grid on;
+    % legend()
+end
+
+subplot(2,1,1);
+legend(legends_x1_in);
+subplot(2,1,2);
+legend(legends_x1_in);
+
 
 
 
