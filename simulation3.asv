@@ -85,18 +85,10 @@ legend(legends_mgth);
 % Simulate the system response to the vehicle experiencing a time phased 1 in step input.
 % 4.) Use the above simulation to compare the response of the parameters determined in
 % 1.) and 2.) above at various speeds.
-% t_des = 1;
-speed = 10; % (l1 + l2) / t_des;
-out = sim("block_sim3");
+t_des = 1;
+speed = % (l1 + l2) / t_des;
+sim("block_sim3");
 
-figure;
-subplot(2,1,1)
-plot(out.x1_in);
-hold on;
-subplot(2,1,2)
-plot(out.x2_in);
-hold on;
-% legend()
 
 
 
