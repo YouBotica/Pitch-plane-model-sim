@@ -46,6 +46,9 @@ Kc_2 = Iy*omega_des_2^2; %(Iy / (1 - x_sp*sqrt(ms/Iy)))*omega_des^2;
 K2_2 = Ka_2 / 1.7;
 K1_2 = 0.7*K2_2;
 
+C1_2 = 21;
+C2_2 = 15;
+
 Kb_2 = K1_2*l1 - K2_2*l2; 
 
 
@@ -55,7 +58,7 @@ Kb_2 = K1_2*l1 - K2_2*l2;
 % 1.) and 2.) above at various speeds.
 % t_des = 1;
 
-speeds = [25, 60, 90, 120]; % (l1 + l2) / t_des;
+speeds = [30, 60, 100, 150]; % (l1 + l2) / t_des;
 
 
 mph2in_sec = 1/0.0568182;
@@ -66,7 +69,7 @@ legends_x1_in = {};
 legends_x = {};
 
 line_width1 = 1.5;
-line_width2 = 0.5;
+line_width2 = 1.5;
 
 for i = 1:length(speeds)
     speed = speeds(i)*mph2in_sec; % Convert speed to in/sec before feeding into the Simulink model
@@ -79,10 +82,12 @@ for i = 1:length(speeds)
     
     % Simulate config1:
     K1 = K1_1; K2 = K2_1;
+    C1 = C1_1; C2 = C2_1;
     out_1 = sim("block_sim3");
     
     % Simulate config2:
     K1 = K1_2; K2 = K2_2;
+    C1 = C1_2; C2 = C2_2;
     out_2 = sim("block_sim3");
     
 
@@ -106,17 +111,17 @@ for i = 1:length(speeds)
     figure(2);
     subplot(4,1,1);
     % plot(out_1.x, 'LineWidth', line_width2, 'Marker', '_', 'Color', [0, 0, 1]);
-    plot(out_1.x, 'LineWidth', line_width2*3);
+    plot(out_1.x, '--', 'LineWidth', line_width2);
     legends_x{end+1} = ['Config 1: Speed = ' num2str(speeds(i))]; 
     hold on;
     grid on;
     % plot(out_2.x, 'LineWidth', line_width2, 'Marker', '_', 'Color', [1, 0, 0]);
-    plot(out_2.x, 'LineWidth', line_width2, 'Marker', '.');
+    plot(out_2.x, 'LineWidth', line_width2);
     legends_x{end+1} = ['Config 2 Speed = ' num2str(speeds(i))]; 
 
     subplot(4,1,2);
     % plot(out_1.dx, 'LineWidth', line_width2, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.dx, 'LineWidth', line_width2);
+    plot(out_1.dx, '--', 'LineWidth', line_width2);
     hold on;
     grid on;
     % plot(out_2.dx, 'LineWidth', line_width2, 'Marker', '+', 'Color', [1, 0, 0]);
@@ -124,7 +129,7 @@ for i = 1:length(speeds)
 
     subplot(4,1,3);
     % plot(out_1.th, 'LineWidth', line_width2, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.th, 'LineWidth', line_width2);
+    plot(out_1.th,  '--', 'LineWidth', line_width2);
     hold on;
     grid on;
     % plot(out_2.th, 'LineWidth', line_width2, 'Marker', '+', 'Color', [1, 0, 0]);
@@ -132,7 +137,7 @@ for i = 1:length(speeds)
 
     subplot(4,1,4);
     % plot(out_1.dth, 'LineWidth', 1.5, 'Marker', '*', 'Color', [0, 0, 1]);
-    plot(out_1.dth, 'LineWidth', line_width2);
+    plot(out_1.dth,  '--', 'LineWidth', line_width2);
     hold on;
     grid on;
     % plot(out_2.dth, 'LineWidth', 1.5, 'Marker', '+', 'Color', [1, 0, 0]);
@@ -160,52 +165,6 @@ legend(legends_x);
 
 
 
-
-
-%%
-
-function pitch_plane_model(K1, K2, C1, C2, l1, l2, ms, Iy)
-
-    A = [
-        0, 1, 0, 0;
-        (-K1 - K2)/ms, (-C1 - C2)/ms, (K1*l1 - K2*l2)/ms, (l1*C1 - l2*C2)/ms;
-        0, 0, 0, 1;
-        (K1*l1 - K2*l2)/Iy, (l1*C1 - l2*C2)/Iy, (-K1*l1^2 - K2*l2^2)/Iy, (-l1*l1*C1 - l2*l2*C2)/Iy;
-        ];
-    
-    B = [K1/ms, K2/ms; 0, 0; -l1*K1/Iy, l2*K2/Iy; 0, 0];
-    
-    C = [1, 0, 0, 0; 0, 0, 1, 0];
-    D = [0, 0; 0, 0];
-    
-    [magx,phasex,wx]=bode(ss(A,B(:,1),C(1,:),[0]),logspace(0,2));
-     mgx(1:50)=magx;
-     phx(1:50)=phasex;
-     
-    [magtheta,phasetheta,wtheta]=bode(ss(A,B(:,1),C(2,:),[0]),logspace(0,2));
-     mgth(1:50)=magtheta;
-     phth(1:50)=phasetheta;
-    
-    % Plot mgx
-    subplot(2,1,1); % This creates the first subplot in a 2-row, 1-column grid
-    semilogx(wx, 20*log10(mgx));
-    title('Magnitude of x');
-    xlabel('Frequency (rad/sec)');
-    ylabel('Magnitude (dB)');
-    hold on;
-    grid on;
-
-    % Plot mgth
-    subplot(2,1,2); % This creates the second subplot in the same grid
-    semilogx(wtheta, 20*log10(mgth));
-    title('Magnitude of theta');
-    xlabel('Frequency (rad/sec)');
-    ylabel('Magnitude (dB)');
-    hold on;
-    grid on;
-    % subplot(1,1,1),semilogx(wx,20*log10(mgx),wtheta,20*log10(mgth))
-
-end
 
 
 
